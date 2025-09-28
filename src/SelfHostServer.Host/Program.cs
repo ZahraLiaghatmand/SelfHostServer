@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.SelfHost;
 
@@ -12,11 +8,23 @@ namespace SelfHostServer.Host
     {
         static void Main(string[] args)
         {
-            var config = new HttpSelfHostConfiguration("http://localhost:5009");
-            config.Routes.MapHttpRoute("default","api/{controller}/{id}", new { id = RouteParameter.Optional });
-            HttpSelfHostServer server = new HttpSelfHostServer(config);
-            server.OpenAsync().Wait();
-            Console.ReadLine();
+            var baseAddress = "http://localhost:5000";
+
+            var config = new HttpSelfHostConfiguration(baseAddress);
+
+            config.Routes.MapHttpRoute(
+                name: "DefaultApi",
+                routeTemplate: "api/{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional }
+            );
+
+            using (HttpSelfHostServer server = new HttpSelfHostServer(config))
+            {
+                server.OpenAsync().Wait();
+                Console.WriteLine($"Self-hosted Web API running at {baseAddress}/api/");
+                Console.WriteLine("Press Enter to exit.");
+                Console.ReadLine();
+            }
         }
     }
 }
